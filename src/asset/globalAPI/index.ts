@@ -24,6 +24,13 @@ export function getAllUsers() {
     headers: { "Content-Type": "application/json" },
   });
 }
+export function getSellers() {
+  let token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.get("/admin/getsellers", {
+    headers: { "Content-Type": "application/json" },
+  });
+}
 export function addUser(data:any) {
   let token = localStorage.getItem("token"); 
   axios.defaults.headers.common["Authorization"] = "Bearer " + token;

@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
-import Login from '../pages/Login';
+import AddResturent from '../pages/AddResturent';
 import LeaveApply from '../pages/LeaveApply';
 import Auth from '../pages/Auth';
 import Dashboard from '../pages/Dashboard';
@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
         path: 'addresturent',
         element: (
           <ProtectedRoute allowedRoles={['admin', 'seller']}>
-            <LeaveApply />
+            <AddResturent />
           </ProtectedRoute>
         ),
       },
