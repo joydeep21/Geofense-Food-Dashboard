@@ -22,13 +22,13 @@ const menuItems: MenuItem[] = [
   {
     title: 'User Management',
     icon: <Users size={20} />,
-    roles: ['admin', 'seller'],
+    roles: ['admin' ],
     submenu: [
       {
         title: 'All Users',
         path: '/users',
         icon: <ChevronRight size={20} />,
-        roles: ['admin', 'seller'],
+        roles: ['admin'],
       },
       // {
       //   title: 'Roles',
@@ -57,12 +57,12 @@ const menuItems: MenuItem[] = [
       },
     ],
   },
-  {
-    title: 'Settings',
-    path: '/settings',
-    icon: <Settings size={20} />,
-    roles: ['admin', 'seller'],
-  },
+  // {
+  //   title: 'Settings',
+  //   path: '/settings',
+  //   icon: <Settings size={20} />,
+  //   roles: ['admin', 'seller'],
+  // },
 ];
 
 const Sidebar = () => {

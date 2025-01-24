@@ -40,8 +40,18 @@ export function addUser(data:any) {
 }
 export function leaveDetails() {
   let token = localStorage.getItem("token"); 
-  axios.defaults.headers.common["Authorization"] = "Bearer" + token;
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
   return axios.get("/admin/getUsers", {
     headers: { "Content-Type": "application/json" },
+  });
+}
+export function resturentAdd(data:any) {
+  let token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  console.log("data is ",data);
+  return axios.post("/restaurant/add", data,{
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 }
