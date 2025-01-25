@@ -2,7 +2,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import AddResturent from '../pages/AddResturent';
-import LeaveApply from '../pages/LeaveApply';
+import Foods from '../pages/Food';
+import FoodDetails from '../pages/FoodDetails';
 import Auth from '../pages/Auth';
 import Dashboard from '../pages/Dashboard';
 import Products from '../pages/Products';
@@ -46,7 +47,15 @@ export const router = createBrowserRouter([
         path: 'foods',
         element: (
           <ProtectedRoute allowedRoles={['seller']}>
-            <LeaveApply />
+            <Foods/>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'food/foodDetails/:id',
+        element: (
+          <ProtectedRoute allowedRoles={['seller']}>
+            <FoodDetails />
           </ProtectedRoute>
         ),
       },
