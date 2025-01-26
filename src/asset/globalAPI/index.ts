@@ -74,10 +74,28 @@ export function foodAdd(data:any) {
   });
 }
 
+export function updateFood(id:any,data:any) {
+  let token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.put(`/food/update/${id}`, data,{
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 export function foodDetailsById(data:any) {
   let token = localStorage.getItem("token"); 
   axios.defaults.headers.common["Authorization"] = "Bearer " + token;
   return axios.get(`/food/foods/${data}`,{
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export function getAllrestaurents() {
+  let token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.get("/restaurant/getAllResturents", {
     headers: { "Content-Type": "application/json" },
   });
 }

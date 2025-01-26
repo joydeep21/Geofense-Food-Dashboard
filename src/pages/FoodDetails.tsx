@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { updateFood } from "../asset/globalAPI"; // Replace with your API import
+import { UploadOutlined } from "@ant-design/icons";
 import {
     Card,
     Image,
@@ -13,6 +15,7 @@ import {
     Button,
     Select,
     message,
+    Upload
 } from "antd";
 import { foodDetailsById } from "../asset/globalAPI"; // Replace with your API import
 
@@ -22,7 +25,6 @@ interface FoodDetailsProps {
     _id: string;
     name: string;
     image: string;
-    distance: number;
     price: number;
     rating: number;
     category: string;
@@ -33,9 +35,12 @@ interface FoodDetailsProps {
 const FoodDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [foodData, setFoodData] = useState<FoodDetailsProps | null>(null); // Renamed
+    const [image, setImage] = useState<File | null>(null);
+    const [imageName, setImageName] = useState("");
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string>(""); // Preview for the new image
 
     const [form] = Form.useForm();
 
@@ -57,27 +62,34 @@ const FoodDetails: React.FC = () => {
 
         fetchFoodDetails();
     }, [id, form]);
+    const handleImageUpload = (file: any) => {
+        setImage(file);
+        setImagePreview(URL.createObjectURL(file)); // Set the preview URL
+        setImageName(file.name); // Set file name
+        return false; // Prevent automatic upload
+    };
 
-    const handleSave = async (values: FoodDetailsProps) => {
+    const handleAddFood = async (values: any) => {
+        setLoading(true);
+        const formData = new FormData();
+        formData.append("name", values.name);
+        if (image) formData.append("image", image);
+        formData.append("price", values.price);
+        formData.append("rating", values.rating);
+        formData.append("category", values.category);
+        formData.append("type", values.type);
+        formData.append("cuisineType", values.cuisineType);
+
         try {
-            const response = await fetch(`http://localhost:3006/api/food/update/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to update food details");
-            }
-
-            const updatedFood = await response.json();
-            setFoodData(updatedFood);
-            message.success("Food details updated successfully!");
-            setIsEditing(false);
-        } catch (err: any) {
-            message.error(err.message || "An error occurred while updating");
+            await updateFood(foodData?._id, formData);
+            message.success("Food added successfully");
+            form.resetFields();
+            setImage(null);
+            setImageName("");
+        } catch (error) {
+            message.error("Failed to update food");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,9 +134,6 @@ const FoodDetails: React.FC = () => {
                             <Descriptions.Item label="Cuisine Type">
                                 {foodData?.cuisineType}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Distance">
-                                {foodData?.distance} km
-                            </Descriptions.Item>
                         </Descriptions>
                         <Button
                             type="primary"
@@ -135,80 +144,82 @@ const FoodDetails: React.FC = () => {
                         </Button>
                     </>
                 ) : (
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        onFinish={handleSave}
-                        initialValues={foodData || {}} // Fixed
-                    >
+                    <Form form={form} layout="vertical" onFinish={handleAddFood}>
+                        <Form.Item label="Current Image">
+                            <Image
+                                src={foodData?.image}
+                                alt="Current Food Image"
+                                style={{ borderRadius: "12px", marginBottom: "10px" }}
+                            />
+                        </Form.Item>
+                        {imagePreview && (
+                            <Form.Item label="New Image Preview">
+                                <Image
+                                    src={imagePreview}
+                                    alt="New Food Image Preview"
+                                    style={{ borderRadius: "12px", marginBottom: "10px" }}
+                                />
+                            </Form.Item>
+                        )}
+                        <Form.Item label="Food Image" rules={[{ required: true, message: "Please upload a New image!" }]}>
+                            <Upload
+                                showUploadList={false}
+                                customRequest={(options) => handleImageUpload(options.file)}
+                            >
+                                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                            </Upload>
+                            {imageName && <p style={{ marginTop: "10px" }}>{imageName}</p>}
+                        </Form.Item>
                         <Form.Item
-                            label="Name"
                             name="name"
+                            label="Food Name"
                             rules={[{ required: true, message: "Please enter the food name" }]}
                         >
-                            <Input />
+                            <Input placeholder="Enter food name" />
                         </Form.Item>
+
                         <Form.Item
-                            label="Image URL"
-                            name="image"
-                            rules={[{ required: true, message: "Please enter the image URL" }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        <Form.Item
-                            label="Price"
                             name="price"
+                            label="Price"
                             rules={[{ required: true, message: "Please enter the price" }]}
                         >
-                            <InputNumber min={1} prefix="₹" style={{ width: "100%" }} />
+                            <Input type="number" placeholder="Enter price" />
                         </Form.Item>
+
                         <Form.Item
-                            label="Rating"
                             name="rating"
+                            label="Rating"
                             rules={[{ required: true, message: "Please enter the rating" }]}
                         >
-                            <InputNumber min={0} max={5} step={0.1} style={{ width: "100%" }} />
+                            <Input placeholder="Enter rating" />
                         </Form.Item>
                         <Form.Item
-                            label="Category"
                             name="category"
+                            label="Category"
                             rules={[{ required: true, message: "Please enter the category" }]}
                         >
-                            <Input />
+                            <Input placeholder="Enter category" />
                         </Form.Item>
                         <Form.Item
-                            label="Type"
                             name="type"
+                            label="Type"
                             rules={[{ required: true, message: "Please enter the type" }]}
                         >
-                            <Select>
-                                <Select.Option value="Vegetarian">Vegetarian</Select.Option>
-                                <Select.Option value="Non-Vegetarian">Non-Vegetarian</Select.Option>
-                            </Select>
+                            <Input placeholder="Enter type" />
                         </Form.Item>
                         <Form.Item
-                            label="Cuisine Type"
                             name="cuisineType"
+                            label="Cuisine Type"
                             rules={[{ required: true, message: "Please enter the cuisine type" }]}
                         >
-                            <Input />
+                            <Input placeholder="Enter cuisine type" />
                         </Form.Item>
-                        <Form.Item
-                            label="Distance"
-                            name="distance"
-                            rules={[{ required: true, message: "Please enter the distance" }]}
-                        >
-                            <InputNumber min={0} step={0.1} style={{ width: "100%" }} />
-                        </Form.Item>
+
+
+
                         <Form.Item>
-                            <Button type="primary" htmlType="submit">
-                                Save
-                            </Button>
-                            <Button
-                                style={{ marginLeft: "10px" }}
-                                onClick={() => setIsEditing(false)}
-                            >
-                                Cancel
+                            <Button type="primary" htmlType="submit" loading={loading}>
+                                Submit
                             </Button>
                         </Form.Item>
                     </Form>
