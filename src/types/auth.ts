@@ -2,6 +2,7 @@ export type UserRole = 'admin' | 'seller';
 
 export interface User {
   role: UserRole;
+  id:string
 }
 
 // const myObject: Record<string, any> = {

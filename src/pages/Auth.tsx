@@ -119,7 +119,8 @@ const Login = () => {
         const user = {
           role: role,
           mobileNumber:mobile,
-          email:response.data.email
+          email:response.data.email,
+          id:response.data.id
         };
         localStorage.setItem('token', token);
 
