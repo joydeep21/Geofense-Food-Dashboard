@@ -107,7 +107,7 @@ const Login = () => {
       role: role,
     };
 
-    console.log("userrequest data", requestUser);
+    // console.log("userrequest data", requestUser);
 
     try {
       const response = await login(requestUser);
@@ -117,8 +117,8 @@ const Login = () => {
 
         const token = response.data.token;
         const user = {
-          role: role,
-          mobileNumber:mobile,
+          role: response.data.role,
+          mobileNumber:response.data.mobile,
           email:response.data.email,
           id:response.data.id
         };
@@ -131,6 +131,7 @@ const Login = () => {
           const encryptedUser = encryptData(JSON.stringify(saveUser));
           localStorage.setItem('user', encryptedUser);
         }
+        // console.log("userrequest data222222222222222222",user);
 
         dispatch(setUser(user));
 

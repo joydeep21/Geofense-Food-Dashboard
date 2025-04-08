@@ -43,23 +43,21 @@ const FoodDetails: React.FC = () => {
     const [imagePreview, setImagePreview] = useState<string>(""); // Preview for the new image
 
     const [form] = Form.useForm();
-
-    useEffect(() => {
-        const fetchFoodDetails = async () => {
-            try {
-                setLoading(true);
-                const response = await foodDetailsById(id);
-                if (response.status === 200) {
-                    setFoodData(response.data);
-                    form.setFieldsValue(response.data);
-                }
-            } catch (err: any) {
-                setError(err.message || "An error occurred");
-            } finally {
-                setLoading(false);
+    const fetchFoodDetails = async () => {
+        try {
+            setLoading(true);
+            const response = await foodDetailsById(id);
+            if (response.status === 200) {
+                setFoodData(response.data);
+                form.setFieldsValue(response.data);
             }
-        };
-
+        } catch (err: any) {
+            setError(err.message || "An error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
         fetchFoodDetails();
     }, [id, form]);
     const handleImageUpload = (file: any) => {
@@ -83,9 +81,12 @@ const FoodDetails: React.FC = () => {
         try {
             await updateFood(foodData?._id, formData);
             message.success("Food added successfully");
-            form.resetFields();
-            setImage(null);
-            setImageName("");
+            setIsEditing(false);
+            fetchFoodDetails();
+
+            // form.resetFields();
+            // setImage(null);
+            // setImageName("");
         } catch (error) {
             message.error("Failed to update food");
         } finally {

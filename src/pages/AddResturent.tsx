@@ -20,7 +20,6 @@ const CreateRestaurant = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   useEffect(() => {
-
     const fetchUsers = async () => {
       try {
         const response = await getSellers();
@@ -102,9 +101,9 @@ const CreateRestaurant = () => {
     return false;
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  // const openModal = () => {
+  //   setIsModalOpen(true);
+  // };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -116,6 +115,19 @@ const CreateRestaurant = () => {
   const navigateToDetails = (id: string) => {
     navigate(`/restaurantdetails/${id}`);
   };
+  const openModal = () => {
+    if (user?.role === "seller" && restaurants.length === 1) {
+      Swal.fire({
+        icon: "warning",
+        title: "Limit Reached",
+        text: "You can only add one restaurant as a seller.",
+      });
+      return;
+    }
+    setIsModalOpen(true);
+  };
+  console.log("rhsdhhhhhj",restaurants);
+  
 
   return (
     <div style={{ padding: "30px", backgroundColor: "#f5f5f5" }}>
@@ -124,6 +136,7 @@ const CreateRestaurant = () => {
         icon={<PlusOutlined />}
         onClick={openModal}
         style={{ marginBottom: "20px" }}
+        // disabled={user?.role === "seller" && restaurants.length === 1}
       >
         Add New Restaurant
       </Button>
