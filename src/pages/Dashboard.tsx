@@ -1,10 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+// import { useSelector } from 'react-redux';
+// import { RootState } from '../store/store';
 import { BarChart, Users, ShoppingBag, DollarSign } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  // const { user } = useSelector((state: RootState) => state.auth);
 
   const stats = [
     {
@@ -32,9 +32,9 @@ const Dashboard = () => {
   return (
     <div>
       {/* <h1 className="text-2xl font-bold mb-8">Welcome to {user?.role.charAt(0).toUpperCase() + user?.role.slice(1).toLowerCase()} Dashboard</h1> */}
-      <h1 className="text-2xl font-bold mb-8">
+      {/* <h1 className="text-2xl font-bold mb-8">
         Welcome to {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() : "Unknown"} Dashboard
-      </h1>
+      </h1> */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat, index) => (
           <div
