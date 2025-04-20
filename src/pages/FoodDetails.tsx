@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { updateFood } from "../asset/globalAPI"; // Replace with your API import
+import { useParams, useNavigate } from "react-router-dom"; // 👈 useNavigate added
+import { updateFood, foodDetailsById, deleteFood } from "../asset/globalAPI"; // 👈 Import deleteFood
 import { UploadOutlined } from "@ant-design/icons";
 import {
     Card,
@@ -11,15 +11,14 @@ import {
     Alert,
     Form,
     Input,
-    InputNumber,
     Button,
-    Select,
+    Upload,
     message,
-    Upload
+    Modal,
 } from "antd";
-import { foodDetailsById } from "../asset/globalAPI"; // Replace with your API import
 
 const { Title } = Typography;
+const { confirm } = Modal;
 
 interface FoodDetailsProps {
     _id: string;
@@ -34,15 +33,18 @@ interface FoodDetailsProps {
 
 const FoodDetails: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [foodData, setFoodData] = useState<FoodDetailsProps | null>(null); // Renamed
+    const navigate = useNavigate(); // 👈 For redirecting after delete
+
+    const [foodData, setFoodData] = useState<FoodDetailsProps | null>(null);
     const [image, setImage] = useState<File | null>(null);
     const [imageName, setImageName] = useState("");
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-    const [imagePreview, setImagePreview] = useState<string>(""); // Preview for the new image
+    const [imagePreview, setImagePreview] = useState<string>("");
 
     const [form] = Form.useForm();
+
     const fetchFoodDetails = async () => {
         try {
             setLoading(true);
@@ -57,14 +59,16 @@ const FoodDetails: React.FC = () => {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         fetchFoodDetails();
-    }, [id, form]);
+    }, [id]);
+
     const handleImageUpload = (file: any) => {
         setImage(file);
-        setImagePreview(URL.createObjectURL(file)); // Set the preview URL
-        setImageName(file.name); // Set file name
-        return false; // Prevent automatic upload
+        setImagePreview(URL.createObjectURL(file));
+        setImageName(file.name);
+        return false;
     };
 
     const handleAddFood = async (values: any) => {
@@ -80,18 +84,36 @@ const FoodDetails: React.FC = () => {
 
         try {
             await updateFood(foodData?._id, formData);
-            message.success("Food added successfully");
+            message.success("Food updated successfully");
             setIsEditing(false);
             fetchFoodDetails();
-
-            // form.resetFields();
-            // setImage(null);
-            // setImageName("");
         } catch (error) {
             message.error("Failed to update food");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDelete = () => {
+        confirm({
+            title: "Are you sure you want to delete this food item?",
+            content: "This action cannot be undone.",
+            okText: "Yes, Delete",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk: async () => {
+                setLoading(true);
+                try {
+                    await deleteFood(foodData?._id || "");
+                    message.success("Food item deleted successfully");
+                    navigate("/foods"); // 🔄 Change this to your list route
+                } catch (error) {
+                    message.error("Failed to delete food item");
+                } finally {
+                    setLoading(false);
+                }
+            },
+        });
     };
 
     if (loading) {
@@ -136,13 +158,14 @@ const FoodDetails: React.FC = () => {
                                 {foodData?.cuisineType}
                             </Descriptions.Item>
                         </Descriptions>
-                        <Button
-                            type="primary"
-                            style={{ marginTop: "20px" }}
-                            onClick={() => setIsEditing(true)}
-                        >
-                            Edit
-                        </Button>
+                        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                            <Button type="primary" onClick={() => setIsEditing(true)}>
+                                Edit
+                            </Button>
+                            <Button danger onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        </div>
                     </>
                 ) : (
                     <Form form={form} layout="vertical" onFinish={handleAddFood}>
@@ -162,7 +185,7 @@ const FoodDetails: React.FC = () => {
                                 />
                             </Form.Item>
                         )}
-                        <Form.Item label="Food Image" rules={[{ required: true, message: "Please upload a New image!" }]}>
+                        <Form.Item label="Food Image">
                             <Upload
                                 showUploadList={false}
                                 customRequest={(options) => handleImageUpload(options.file)}
@@ -178,7 +201,6 @@ const FoodDetails: React.FC = () => {
                         >
                             <Input placeholder="Enter food name" />
                         </Form.Item>
-
                         <Form.Item
                             name="price"
                             label="Price"
@@ -186,7 +208,6 @@ const FoodDetails: React.FC = () => {
                         >
                             <Input type="number" placeholder="Enter price" />
                         </Form.Item>
-
                         <Form.Item
                             name="rating"
                             label="Rating"
@@ -215,9 +236,6 @@ const FoodDetails: React.FC = () => {
                         >
                             <Input placeholder="Enter cuisine type" />
                         </Form.Item>
-
-
-
                         <Form.Item>
                             <Button type="primary" htmlType="submit" loading={loading}>
                                 Submit

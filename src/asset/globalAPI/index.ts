@@ -100,3 +100,44 @@ export function getAllrestaurents() {
     headers: { "Content-Type": "application/json" },
   });
 }
+
+
+export function deleteUser(id:string) {
+  const token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.delete(`/users/delete/${id}`,{
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function updateUser(id:string,userData: any) {
+  const token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.put(`/users/update/${id}`,userData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function deleteFood(id:string) {
+  const token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.delete(`/food/foods/${id}`,{
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+export function updateRestaurents(id:string,userData: any) {
+  const token = localStorage.getItem("token"); 
+  axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+  return axios.put(`/restaurant/update/${id}`,userData, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+}

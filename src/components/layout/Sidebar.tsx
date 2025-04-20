@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { ChevronDown, ChevronRight, LayoutDashboard, Users, ShoppingBag, Settings, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, LayoutDashboard, Users, ShoppingBag, Menu } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 
