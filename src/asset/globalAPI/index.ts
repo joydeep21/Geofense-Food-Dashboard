@@ -2,8 +2,8 @@ import axios from "axios";
 // import FormData from "form-data"; // Using ES6 import for consistency
 
 // Set the base URL for the Axios instance
-// axios.defaults.baseURL = "http://localhost:3006/api";
-axios.defaults.baseURL = "http://web.sensegeofence.com/api";
+axios.defaults.baseURL = "http://localhost:3006/api";
+// axios.defaults.baseURL = "https://web.sensegeofence.com/api";
 // Uncomment the following line to switch to production environment
 // axios.defaults.baseURL = "https://task-manger-backend-skr2.onrender.com/web";
 
