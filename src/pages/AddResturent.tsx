@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   getSellers,
   resturentAdd,
@@ -20,8 +21,31 @@ import {
   Col,
   Row,
 } from "antd";
-import { UploadOutlined, PlusOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  PlusOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+
+const { Option } = Select;
+
+const categoryOptions = [
+  "Fine Dining",
+  "Café",
+  "Takeaway",
+  "Buffet",
+  "Fast Food",
+];
+const typeOptions = ["Veg", "Non-Veg", "Both"];
+const cuisineOptions = [
+  "Indian",
+  "Chinese",
+  "Italian",
+  "Mexican",
+  "Thai",
+  "Continental",
+];
 
 const CreateRestaurant = () => {
   const [form] = Form.useForm();
@@ -86,9 +110,9 @@ const CreateRestaurant = () => {
     if (image) formData.append("Restaurant_image", image);
     formData.append("address", values.address);
     formData.append("rating", values.rating.toString());
-    formData.append("category", values.category);
-    formData.append("type", values.type);
-    formData.append("cuisineType", values.cuisineType);
+    formData.append("category", JSON.stringify(values.category));
+    formData.append("type", JSON.stringify(values.type));
+    formData.append("cuisineType", JSON.stringify(values.cuisineType));
     formData.append("location", values.location);
     formData.append("assignedUser", assignedUser || "");
 
@@ -105,6 +129,8 @@ const CreateRestaurant = () => {
         }
       } else {
         const response = await resturentAdd(formData);
+        console.log("response",response);
+        
         if (response.status === 201 || response.status === 203) {
           Swal.fire({
             icon: response.status === 201 ? "success" : "warning",
@@ -167,9 +193,9 @@ const CreateRestaurant = () => {
       name: restaurant.name,
       address: restaurant.address,
       rating: restaurant.rating,
-      category: restaurant.category,
-      type: restaurant.type,
-      cuisineType: restaurant.cuisineType,
+      category: restaurant.category || [],
+      type: restaurant.type || [],
+      cuisineType: restaurant.cuisineType || [],
       location: restaurant.location,
     });
     setAssignedUser(restaurant.assignedUser?._id || null);
@@ -206,7 +232,9 @@ const CreateRestaurant = () => {
           <Form.Item label="Restaurant Image">
             <Upload
               showUploadList={false}
-              customRequest={(options) => handleImageUpload(options.file as File)}
+              customRequest={(options) =>
+                handleImageUpload(options.file as File)
+              }
             >
               <Button icon={<UploadOutlined />}>Click to Upload</Button>
             </Upload>
@@ -239,25 +267,43 @@ const CreateRestaurant = () => {
           <Form.Item
             label="Category"
             name="category"
-            rules={[{ required: true, message: "Please enter the category!" }]}
+            rules={[{ required: true, message: "Please select category!" }]}
           >
-            <Input />
+            <Select mode="multiple" placeholder="Select category">
+              {categoryOptions.map((item) => (
+                <Option key={item} value={item}>
+                  {item}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
             label="Type"
             name="type"
-            rules={[{ required: true, message: "Please enter the type!" }]}
+            rules={[{ required: true, message: "Please select type!" }]}
           >
-            <Input />
+            <Select mode="multiple" placeholder="Select type">
+              {typeOptions.map((item) => (
+                <Option key={item} value={item}>
+                  {item}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
             label="Cuisine Type"
             name="cuisineType"
-            rules={[{ required: true, message: "Please enter the cuisine type!" }]}
+            rules={[{ required: true, message: "Please select cuisine!" }]}
           >
-            <Input />
+            <Select mode="multiple" placeholder="Select cuisine type">
+              {cuisineOptions.map((item) => (
+                <Option key={item} value={item}>
+                  {item}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item
@@ -274,11 +320,11 @@ const CreateRestaurant = () => {
                 value={assignedUser || ""}
                 onChange={(value) => setAssignedUser(value)}
               >
-                <Select.Option value="">None</Select.Option>
+                <Option value="">None</Option>
                 {users.map((user) => (
-                  <Select.Option key={user._id} value={user._id}>
+                  <Option key={user._id} value={user._id}>
                     {user.name}
-                  </Select.Option>
+                  </Option>
                 ))}
               </Select>
             </Form.Item>
@@ -318,7 +364,7 @@ const CreateRestaurant = () => {
                   description={`${restaurant.address.substring(0, 50)}...`}
                 />
                 <p>Rating: {restaurant.rating}</p>
-                <p>Category: {restaurant.category}</p>
+                <p>Category: {(restaurant.category || []).join(", ")}</p>
               </Card>
             </Col>
           ))}
